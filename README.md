@@ -115,19 +115,77 @@ python SQL_Analytics/sql_analysis.py > SQL_Analytics/sql_queries_output.txt
 
 ## Sample Output
 
-```
-================================================================================
-QUERY: 4.1 - Overall Churn Rate (KEY METRIC)
-================================================================================
-SQL:
-SELECT
-    COUNT(CASE WHEN Churn = 'True' THEN 1 END) as churned_customers,
-    COUNT(*) as total_customers,
-    ROUND(COUNT(CASE WHEN Churn = 'True' THEN 1 END) * 100.0 / COUNT(*), 2) as churn_rate_percentage
-FROM customers
+### Data Aggregation
 
-   churned_customers  total_customers  churn_rate_percentage
-0                388             2666                  14.55
+```
+QUERY: 2.1 - Total number of customers
+   total_customers
+0             2666
+
+QUERY: 2.2 - Average charges by time period
+   avg_day_charge  avg_eve_charge  avg_night_charge
+0           30.51           17.03              9.05
+
+QUERY: 2.3 - Customer count by state (Top 10)
+  State  customer_count
+0    WV              88
+1    MN              70
+2    NY              68
+3    VA              67
+4    WY              66
+5    OH              66
+6    AL              66
+7    OR              62
+8    WI              61
+9    NV              61
+
+QUERY: 2.5 - Analysis by International Plan
+  International plan  total_customers  avg_intl_charge  total_intl_revenue
+0                 No             2396             2.75             6591.61
+1                Yes              270             2.88              778.52
+```
+
+### Advanced Queries
+
+```
+QUERY: 3.1 - Categorize customers by service calls
+   Customer service calls  customer_count call_category
+0                       0             555      No Calls
+1                       1             945           Low
+2                       2             608           Low
+3                       3             348           Low
+4                       4             133        Medium
+5                       5              49        Medium
+6                       6              17        Medium
+7                       7               8          High
+8                       8               1          High
+9                       9               2          High
+
+QUERY: 3.3 - Churn analysis with multiple metrics
+   Churn  count  avg_account_length  avg_total_charge  avg_service_calls
+0      0   2278              100.33             55.69               1.45
+1      1    388              102.32             61.92               2.21
+```
+
+### Business KPIs
+
+```
+QUERY: 4.2 - Revenue Analysis
+   total_revenue  avg_revenue_per_customer  total_customers
+0      158260.84                     59.36             2666
+
+QUERY: 4.3 - High-value customers by state (charges > $60)
+  State  high_value_customers  avg_charges
+0    WY                    29        65.79
+1    WV                    28        65.82
+2    OH                    28        67.68
+3    MN                    28        67.28
+4    KS                    27        68.33
+5    IN                    27        67.20
+6    NJ                    26        67.02
+7    MD                    26        68.94
+8    FL                    26        66.41
+9    AL                    26        66.67
 ```
 
 ## License
