@@ -8,9 +8,10 @@ Author: Methila
 Date: 2026
 """
 
+import argparse
 import pandas as pd
 import sqlite3
-import os
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -89,7 +90,7 @@ class SQLBusinessAnalytics:
         )
 
         self.execute_query(
-            "SELECT * FROM customers WHERE Churn = 'True' LIMIT 10",
+            "SELECT * FROM customers WHERE Churn = 1 LIMIT 10",
             "1.3 - Filter customers who churned",
         )
 
@@ -159,7 +160,7 @@ class SQLBusinessAnalytics:
                 COUNT(*) as churn_count,
                 ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM customers), 2) as churn_percentage
                FROM customers
-               WHERE Churn = 'True'
+               WHERE Churn = 1
                GROUP BY State
                HAVING churn_count > 5
                ORDER BY churn_count DESC""",
@@ -219,9 +220,9 @@ class SQLBusinessAnalytics:
 
         self.execute_query(
             """SELECT
-                COUNT(CASE WHEN Churn = 'True' THEN 1 END) as churned_customers,
+                COUNT(CASE WHEN Churn = 1 THEN 1 END) as churned_customers,
                 COUNT(*) as total_customers,
-                ROUND(COUNT(CASE WHEN Churn = 'True' THEN 1 END) * 100.0 / COUNT(*), 2) as churn_rate_percentage
+                ROUND(COUNT(CASE WHEN Churn = 1 THEN 1 END) * 100.0 / COUNT(*), 2) as churn_rate_percentage
                FROM customers""",
             "4.1 - Overall Churn Rate (KEY METRIC)",
         )
@@ -270,19 +271,78 @@ class SQLBusinessAnalytics:
         print("\nDatabase connection closed.")
 
 
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="SQL for Business Analytics - Telecom Churn Analysis",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python sql_analysis.py                          Run full analysis
+  python sql_analysis.py --section basic          Run only basic queries
+  python sql_analysis.py --section kpi            Run only KPI queries
+  python sql_analysis.py --data path/to/file.csv  Use custom dataset
+  python sql_analysis.py --db custom.db           Use custom database
+        """,
+    )
+    parser.add_argument(
+        "--data",
+        type=str,
+        default=None,
+        help="Path to CSV dataset (default: datasets/Data Set For Task/Churn Prdiction Data/churn-bigml-80.csv)",
+    )
+    parser.add_argument(
+        "--db",
+        type=str,
+        default="business_analytics.db",
+        help="SQLite database file (default: business_analytics.db)",
+    )
+    parser.add_argument(
+        "--section",
+        choices=["basic", "aggregation", "advanced", "kpi", "all"],
+        default="all",
+        help="Which query section to run (default: all)",
+    )
+    return parser.parse_args()
+
+
 def main():
     """Main entry point for the analytics pipeline."""
+    args = parse_args()
+
     print("=" * 80)
     print("CODVEDA INTERNSHIP - TASK 2: SQL FOR BUSINESS ANALYTICS")
     print("=" * 80)
     print(f"Execution Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
     project_root = Path(__file__).resolve().parent.parent
-    data_path = project_root / "datasets" / "Data Set For Task" / "Churn Prdiction Data" / "churn-bigml-80.csv"
-    db_path = project_root / "business_analytics.db"
+    data_path = Path(args.data) if args.data else (
+        project_root / "datasets" / "Data Set For Task" / "Churn Prdiction Data" / "churn-bigml-80.csv"
+    )
+    db_path = Path(args.db) if os.path.isabs(args.db) else project_root / args.db
 
     sql_analytics = SQLBusinessAnalytics(str(db_path))
-    sql_analytics.run_full_analysis(str(data_path))
+
+    if not data_path.exists():
+        print(f"Error: Dataset not found at {data_path}")
+        sql_analytics.close()
+        sys.exit(1)
+
+    sql_analytics.load_csv_to_db(str(data_path), "customers")
+
+    sections = {
+        "basic": sql_analytics.basic_queries,
+        "aggregation": sql_analytics.aggregation_queries,
+        "advanced": sql_analytics.advanced_queries,
+        "kpi": sql_analytics.business_insights,
+    }
+
+    if args.section == "all":
+        for section_fn in sections.values():
+            section_fn()
+    else:
+        sections[args.section]()
+
     sql_analytics.close()
 
     print("\n" + "=" * 80)
