@@ -1,0 +1,10 @@
+SQL for Business Analytics - Query Output
+==========================================
+
+Run the analysis script to generate output:
+
+    python SQL_Analytics/sql_analysis.py
+
+Results will be printed to the console and can be redirected:
+
+    python SQL_Analytics/sql_analysis.py > SQL_Analytics/sql_queries_output.txt
