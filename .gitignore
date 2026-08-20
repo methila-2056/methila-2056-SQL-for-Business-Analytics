@@ -27,6 +27,7 @@ ENV/
 
 # SQLite Database (generated files)
 *.db
+test_analytics.db
 
 # Environment variables
 .env

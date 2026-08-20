@@ -36,12 +36,25 @@ SQL-for-Business-Analytics/
 │       ├── 1) iris.csv
 │       ├── 3) Sentiment dataset.csv
 │       └── 4) house Prediction Data Set.csv
+├── sql/                                 # Standalone SQL query files
+│   ├── 01_basic_queries.sql
+│   ├── 02_aggregation_queries.sql
+│   ├── 03_advanced_queries.sql
+│   └── 04_business_kpis.sql
 ├── SQL_Analytics/
 │   ├── sql_analysis.py                  # Main analysis script
-│   ├── sql_queries_output.txt           # Query output reference
-│   └── SQL_Report.pdf                   # Generated report
+│   └── sql_queries_output.txt           # Query output reference
+├── tests/
+│   └── test_sql_analysis.py            # Unit tests
+├── docs/
+│   └── data_dictionary.md              # Column descriptions and metrics
+├── .github/workflows/
+│   └── ci.yml                           # GitHub Actions CI pipeline
 ├── business_analytics.db                # SQLite database (generated)
+├── pyproject.toml                       # Package configuration
 ├── requirements.txt
+├── CONTRIBUTING.md
+├── LICENSE
 ├── .gitignore
 └── README.md
 ```
@@ -53,6 +66,8 @@ SQL-for-Business-Analytics/
 | **SQL (SQLite)** | Data querying and aggregation |
 | **Python** | Scripting and automation |
 | **Pandas** | Data manipulation and analysis |
+| **GitHub Actions** | CI/CD pipeline |
+| **Flake8** | Code linting |
 
 ## Analysis Performed
 
@@ -106,6 +121,23 @@ SQL-for-Business-Analytics/
    ```bash
    python SQL_Analytics/sql_analysis.py
    ```
+
+### CLI Options
+
+```bash
+python SQL_Analytics/sql_analysis.py --section basic         # Run basic queries only
+python SQL_Analytics/sql_analysis.py --section aggregation   # Run aggregation queries only
+python SQL_Analytics/sql_analysis.py --section advanced      # Run advanced queries only
+python SQL_Analytics/sql_analysis.py --section kpi           # Run KPI queries only
+python SQL_Analytics/sql_analysis.py --data path/to/file.csv # Use custom dataset
+python SQL_Analytics/sql_analysis.py --db custom.db          # Use custom database
+```
+
+### Running Tests
+
+```bash
+python tests/test_sql_analysis.py
+```
 
 ### Redirecting Output
 
