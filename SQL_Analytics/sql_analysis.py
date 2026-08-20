@@ -9,6 +9,7 @@ Date: 2026
 """
 
 import argparse
+import os
 import pandas as pd
 import sqlite3
 import sys
